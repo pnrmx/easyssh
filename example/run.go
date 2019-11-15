@@ -14,6 +14,7 @@ func main() {
 		// Optional key or Password without either we try to contact your agent SOCKET
 		//Password: "password",
 		Key:  "/.ssh/id_rsa",
+		FixedHost: "/.ssh/known_hosts",
 		Port: "22",
 	}
 

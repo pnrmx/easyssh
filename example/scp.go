@@ -11,6 +11,7 @@ func main() {
 		User:     "root",
 		Server:   "example.com",
 		Password: "123qwe",
+		FixedHost: "/.ssh/known_hosts",
 		Port:     "22",
 	}
 

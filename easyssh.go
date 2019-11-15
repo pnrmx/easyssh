@@ -27,17 +27,18 @@ import (
 // Note: easyssh looking for private key in user's home directory (ex. /home/john + Key).
 // Then ensure your Key begins from '/' (ex. /.ssh/id_rsa)
 type MakeConfig struct {
-	User     string
-	Server   string
-	Key      string
-	Port     string
-	Password string
+	User      string
+	Server    string
+	Key       string
+	Port      string
+	Password  string
+	FixedHost string
 }
 
 // returns ssh.Signer from user you running app home path + cutted key path.
 // (ex. pubkey,err := getKeyFile("/.ssh/id_rsa") )
 func getKeyFile(keypath string) (ssh.Signer, error) {
-	usr, err := user.Current()
+	usr, err := user.Current() //returns user{uid,gid,username,name,homedir}
 	if err != nil {
 		return nil, err
 	}
@@ -54,6 +55,28 @@ func getKeyFile(keypath string) (ssh.Signer, error) {
 	}
 
 	return pubkey, nil
+}
+
+// ex. getHostKey ("/.ssh/known_hosts")
+func getHostKey(hostpath string) (ssh.PublicKey, error) {
+
+	usr, err := user.Current() //returns user{uid,gid,username,name,homedir}
+	if err != nil {
+		return nil, err
+	}
+
+	file := usr.HomeDir + hostpath
+	buf, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+
+	_, _, hostkey, _, _, err := ssh.ParseKnownHosts(buf)
+	if err != nil {
+		return nil, err
+	}
+
+	return hostkey, nil
 }
 
 // connects to remote server using MakeConfig struct and returns *ssh.Session
@@ -75,9 +98,16 @@ func (ssh_conf *MakeConfig) connect() (*ssh.Session, error) {
 		auths = append(auths, ssh.PublicKeys(pubkey))
 	}
 
+	hostkey, err := getHostKey(ssh_conf.FixedHost)
+	if err != nil {
+		return nil, err
+	}
+	hostCallBack := ssh.FixedHostKey(hostkey)
+
 	config := &ssh.ClientConfig{
-		User: ssh_conf.User,
-		Auth: auths,
+		User:            ssh_conf.User,
+		Auth:            auths,
+		HostKeyCallback: hostCallBack,
 	}
 
 	client, err := ssh.Dial("tcp", ssh_conf.Server+":"+ssh_conf.Port, config)
