@@ -8,6 +8,6 @@ Do not need to think about Dials, sessions, defers and public keys...Let easyssh
 
 ## So easy to use!
 
-[Run a command on remote server and get STDOUT output](https://github.com/hypersleep/easyssh/blob/master/example/run.go)
+[Run a command on remote server and get STDOUT output](https://github.com/pnrmx/easyssh/blob/master/example/run.go)
 
-[Upload a file to remote server](https://github.com/hypersleep/easyssh/blob/master/example/scp.go)
+[Upload a file to remote server](https://github.com/pnrmx/easyssh/blob/master/example/scp.go)
